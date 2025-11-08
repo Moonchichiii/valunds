@@ -1,0 +1,67 @@
+# Valunds Backend Requirements (Django)
+
+# CORE / DJANGO
+Django
+django-csp
+django-cors-headers
+djangorestframework
+django-filter
+djangorestframework-simplejwt
+
+# SECURITY / ABUSE PREVENTION
+django-axes
+django-ratelimit
+
+# MEDIA & STORAGE (Cloudinary)
+cloudinary
+django-cloudinary-storage
+Pillow
+django-imagekit
+
+# DATABASE / CONFIG
+psycopg2-binary
+dj-database-url
+python-decouple
+
+# CACHING / TASKS
+redis
+celery
+django-redis
+hiredis
+
+# EMAIL
+django-anymail
+
+# CALENDAR / GOOGLE APIs
+ics
+google-auth
+google-auth-oauthlib
+google-auth-httplib2
+google-api-python-client
+
+# PAYMENTS (prep)
+stripe
+
+# API DOCUMENTATION
+drf-spectacular
+drf-spectacular-sidecar
+
+# PRODUCTION SERVER / STATIC
+gunicorn
+uvicorn[standard]
+whitenoise
+
+# DEV-ONLY (strip in prod)
+ruff
+mypy
+django-stubs[compatible-mypy]
+djangorestframework-stubs
+pytest
+pytest-django
+factory-boy
+faker
+freezegun
+ipython
+coverage
+django-debug-toolbar
+django-extensions
