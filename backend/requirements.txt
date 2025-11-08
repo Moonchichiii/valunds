@@ -12,6 +12,10 @@ djangorestframework-simplejwt
 django-axes
 django-ratelimit
 
+# AUTHENTICATION
+django-allauth
+dj-rest-auth
+
 # MEDIA & STORAGE (Cloudinary)
 cloudinary
 django-cloudinary-storage
