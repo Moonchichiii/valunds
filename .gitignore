@@ -1,0 +1,139 @@
+# ----- Python core -----
+__pycache__/
+*.py[cod]
+*$py.class
+*.pyo
+*.pyd
+
+# Virtualenvs
+.venv/
+venv/
+env/
+ENV/
+
+# Python packaging / build
+build/
+dist/
+*.egg-info/
+*.egg
+.eggs/
+wheels/
+pip-wheel-metadata/
+pip-log.txt
+
+# Tools & caches
+.mypy_cache/
+.pytest_cache/
+.ruff_cache/
+.pyre/
+.pytype/
+.cache/
+.coverage
+.coverage.*
+htmlcov/
+coverage.xml
+.tox/
+pytestdebug.log
+
+# Editors / OS clutter
+.DS_Store
+Thumbs.db
+Icon?
+*.swp
+*.swo
+*.tmp
+*.orig
+*.bak
+*.log
+
+# ----- Django specifics -----
+# Local settings / overrides
+local_settings.py
+settings_local.py
+
+# SQLite & local DBs
+db.sqlite3
+*.sqlite3
+
+# Static & media (generated at runtime)
+# Keep your source static under e.g. backend/apps/**/static/** checked in;
+# only ignore collected and uploaded files below.
+staticfiles/
+static_root/
+static-collected/
+media/
+media_root/
+uploads/
+user_uploads/
+
+# Runtime files
+*.pid
+*.pid.lock
+celerybeat-schedule
+celerybeat.pid
+celeryd.pid
+gunicorn*.log
+
+
+# ----- Env & secrets -----
+.env
+.env.*
+!.env.example
+*.env.local
+*.secrets
+secrets.json
+credentials.json
+service-account.json
+*.pem
+*.key
+*.crt
+*.pfx
+*.p12
+*.jwt
+
+# OAuth / cloud creds
+gcloud-*.json
+firebase-*.json
+
+# ----- Docker & Compose -----
+# Ignore local build context artifacts
+.docker/
+docker/overlay/
+docker-compose.override.yml
+
+# ----- Logs & dumps -----
+logs/
+*.log
+*.out
+*.err
+*.dump
+*.sql
+*.psql
+*.sql.gz
+*.tar
+*.tar.gz
+*.zip
+
+# ----- Celery / Redis temp -----
+celery/
+celery/*/
+*.rq
+
+# ----- IDE project files -----
+.vscode/
+.idea/
+*.iml
+.project
+.pydevproject
+
+# ----- Misc large/temporary files -----
+*.map
+*.icns
+*.cur
+*.psd
+*.ai
+*.sketch
+
+# ----- Local SSL for dev -----
+ssl/
+certs/
