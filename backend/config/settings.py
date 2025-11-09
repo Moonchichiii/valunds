@@ -1,10 +1,10 @@
-import os
 from datetime import timedelta
+import os
 from pathlib import Path
 
+from decouple import Config, Csv, RepositoryEnv, config as base_config
 import dj_database_url
-from decouple import Config, Csv, RepositoryEnv
-from decouple import config as base_config
+
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 

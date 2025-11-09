@@ -1,6 +1,7 @@
 from django.urls import include, path
 from rest_framework.routers import DefaultRouter
 
+
 # Central DRF router (register viewsets here as they appear)
 router = DefaultRouter()
 # Example later:
