@@ -7,10 +7,9 @@ from decouple import Config, Csv, RepositoryEnv
 from decouple import config as base_config
 
 BASE_DIR = Path(__file__).resolve().parent.parent
-REPO_ROOT = BASE_DIR.parent
 
 DJANGO_ENV = os.getenv("DJANGO_ENV", "dev")
-env_path = REPO_ROOT / f".env.{DJANGO_ENV}"
+env_path = BASE_DIR / f".env.{DJANGO_ENV}"
 config = Config(RepositoryEnv(str(env_path))) if env_path.exists() else base_config
 
 # Core Settings
@@ -93,8 +92,8 @@ TEMPLATES = [
         },
     },
 ]
+
 # Database
-DATABASE_URL = config("DATABASE_URL", default="")
 DATABASE_URL = config("DATABASE_URL", default="")
 if DATABASE_URL:
     DATABASES = {"default": dj_database_url.parse(DATABASE_URL, conn_max_age=600)}
@@ -138,6 +137,8 @@ REST_FRAMEWORK = {
     "DEFAULT_PERMISSION_CLASSES": ("rest_framework.permissions.IsAuthenticatedOrReadOnly",),
     "DEFAULT_FILTER_BACKENDS": ["django_filters.rest_framework.DjangoFilterBackend"],
     "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
+    "DEFAULT_PAGINATION_CLASS": "apps.core.pagination.DefaultPagination",
+    "PAGE_SIZE": 20,
 }
 
 SPECTACULAR_SETTINGS = {"TITLE": "Valund API", "VERSION": "0.1.0"}
@@ -173,5 +174,43 @@ LOCALE_PATHS = [BASE_DIR / "locale"]
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 # Custom User Model
-# AUTH_USER_MODEL = "accounts.User"
-# AUTH_USER_MODEL = "accounts.User"
+AUTH_USER_MODEL = "accounts.User"
+
+# Authentication backends (needed for django-allauth)
+AUTHENTICATION_BACKENDS = (
+    "django.contrib.auth.backends.ModelBackend",
+    "allauth.account.auth_backends.AuthenticationBackend",
+)
+
+# Allauth / dj-rest-auth (email-first)
+ACCOUNT_AUTHENTICATION_METHOD = "email"
+ACCOUNT_EMAIL_REQUIRED = True
+ACCOUNT_USERNAME_REQUIRED = False
+ACCOUNT_EMAIL_VERIFICATION = "optional"
+ACCOUNT_ADAPTER = "allauth.account.adapter.DefaultAccountAdapter"
+
+# dj-rest-auth → use the canonical flag name
+REST_USE_JWT = True
+
+# Let allauth know there is no username field on the custom user
+ACCOUNT_USER_MODEL_USERNAME_FIELD = None
+
+# dj-rest-auth serializers
+REST_AUTH_REGISTER_SERIALIZERS = {
+    "REGISTER_SERIALIZER": "apps.accounts.serializers.CustomRegisterSerializer",
+}
+REST_AUTH_SERIALIZERS = {
+    "USER_DETAILS_SERIALIZER": "apps.accounts.serializers.UserSerializer",
+}
+
+# CSRF trusted origins (add your frontend URL(s) in .env)
+CSRF_TRUSTED_ORIGINS = config(
+    "CSRF_TRUSTED_ORIGINS", cast=Csv(), default="http://localhost,https://localhost"
+)
+
+# (Optional but recommended) If you'll be behind a proxy/ingress in prod
+# SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
+# SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
+# SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
+# SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
+# SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
