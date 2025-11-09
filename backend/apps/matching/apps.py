@@ -2,5 +2,6 @@ from django.apps import AppConfig
 
 
 class MatchingConfig(AppConfig):
-    default_auto_field = 'django.db.models.BigAutoField'
-    name = 'matching'
+    default_auto_field = "django.db.models.BigAutoField"
+    name = "apps.matching"
+    label = "matching"

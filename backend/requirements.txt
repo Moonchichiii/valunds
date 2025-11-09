@@ -11,6 +11,7 @@ djangorestframework-simplejwt
 # SECURITY / ABUSE PREVENTION
 django-axes
 django-ratelimit
+cryptography
 
 # AUTHENTICATION
 django-allauth

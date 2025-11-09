@@ -1,3 +1,7 @@
+"""
+Django settings for Valund project.
+"""
+
 from datetime import timedelta
 import os
 from pathlib import Path
@@ -6,19 +10,37 @@ from decouple import Config, Csv, RepositoryEnv, config as base_config
 import dj_database_url
 
 
+# =============================================================================
+# PATH & ENVIRONMENT CONFIGURATION
+# =============================================================================
+
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 DJANGO_ENV = os.getenv("DJANGO_ENV", "dev")
 env_path = BASE_DIR / f".env.{DJANGO_ENV}"
 config = Config(RepositoryEnv(str(env_path))) if env_path.exists() else base_config
 
-# Core Settings
+
+# =============================================================================
+# CORE DJANGO SETTINGS
+# =============================================================================
+
 SECRET_KEY = config("DJANGO_SECRET_KEY")
 DEBUG = config("DJANGO_DEBUG", cast=bool, default=False)
 ALLOWED_HOSTS = config("DJANGO_ALLOWED_HOSTS", cast=Csv(), default="localhost,127.0.0.1")
+ROOT_URLCONF = "config.urls"
+WSGI_APPLICATION = "config.wsgi.application"
+ASGI_APPLICATION = "config.asgi.application"
+SITE_ID = 1
+DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
-# Applications
+
+# =============================================================================
+# INSTALLED APPLICATIONS
+# =============================================================================
+
 INSTALLED_APPS = [
+    # Django Core Apps
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
@@ -26,20 +48,27 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     "django.contrib.sites",
+    # Third Party Apps - Authentication
     "allauth",
     "allauth.account",
     "allauth.socialaccount",
+    "allauth.socialaccount.providers.google",
+    "allauth.socialaccount.providers.github",
     "dj_rest_auth",
     "dj_rest_auth.registration",
+    # Third Party Apps - API & Utils
     "corsheaders",
     "rest_framework",
     "rest_framework_simplejwt",
     "django_filters",
     "drf_spectacular",
+    "drf_spectacular_sidecar",
+    # Third Party Apps - Security & Storage
     "axes",
     "ratelimit",
     "cloudinary",
     "cloudinary_storage",
+    # Local Apps
     "apps.core",
     "apps.accounts",
     "apps.authn",
@@ -57,9 +86,11 @@ INSTALLED_APPS = [
     "apps.api",
 ]
 
-SITE_ID = 1
 
-# Middleware
+# =============================================================================
+# MIDDLEWARE CONFIGURATION
+# =============================================================================
+
 MIDDLEWARE = [
     "corsheaders.middleware.CorsMiddleware",
     "django.middleware.security.SecurityMiddleware",
@@ -68,16 +99,17 @@ MIDDLEWARE = [
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
+    "allauth.account.middleware.AccountMiddleware",  # Required for django-allauth
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
     "axes.middleware.AxesMiddleware",
 ]
 
-ROOT_URLCONF = "config.urls"
-WSGI_APPLICATION = "config.wsgi.application"
-ASGI_APPLICATION = "config.asgi.application"
 
-# Templates
+# =============================================================================
+# TEMPLATE CONFIGURATION
+# =============================================================================
+
 TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
@@ -93,7 +125,11 @@ TEMPLATES = [
     },
 ]
 
-# Database
+
+# =============================================================================
+# DATABASE CONFIGURATION
+# =============================================================================
+
 DATABASE_URL = config("DATABASE_URL", default="")
 if DATABASE_URL:
     DATABASES = {"default": dj_database_url.parse(DATABASE_URL, conn_max_age=600)}
@@ -105,13 +141,22 @@ else:
         }
     }
 
-# Internationalization
+
+# =============================================================================
+# INTERNATIONALIZATION & LOCALIZATION
+# =============================================================================
+
 LANGUAGE_CODE = "en"
 TIME_ZONE = "Europe/Stockholm"
 USE_I18N = True
 USE_TZ = True
+LOCALE_PATHS = [BASE_DIR / "locale"]
 
-# Static Files
+
+# =============================================================================
+# STATIC FILES & MEDIA CONFIGURATION
+# =============================================================================
+
 STATIC_URL = "/static/"
 STATIC_ROOT = BASE_DIR / "static"
 MEDIA_URL = "/media/"
@@ -122,14 +167,22 @@ STORAGES = {
     "default": {"BACKEND": "cloudinary_storage.storage.MediaCloudinaryStorage"},
 }
 
-# Cloudinary
+# Cloudinary Configuration
 CLOUDINARY_URL = config("CLOUDINARY_URL", default="")
 
-# CORS
+
+# =============================================================================
+# CORS CONFIGURATION
+# =============================================================================
+
 CORS_ALLOWED_ORIGINS = config("CORS_ALLOWED_ORIGINS", cast=Csv(), default="")
 CORS_ALLOW_CREDENTIALS = True
 
-# Django REST Framework
+
+# =============================================================================
+# DJANGO REST FRAMEWORK CONFIGURATION
+# =============================================================================
+
 REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": (
         "rest_framework_simplejwt.authentication.JWTAuthentication",
@@ -141,9 +194,14 @@ REST_FRAMEWORK = {
     "PAGE_SIZE": 20,
 }
 
+# API Documentation
 SPECTACULAR_SETTINGS = {"TITLE": "Valund API", "VERSION": "0.1.0"}
 
-# JWT Settings
+
+# =============================================================================
+# JWT AUTHENTICATION CONFIGURATION
+# =============================================================================
+
 SIMPLE_JWT = {
     "AUTH_HEADER_TYPES": ("Bearer",),
     "ACCESS_TOKEN_LIFETIME": timedelta(minutes=30),
@@ -151,7 +209,11 @@ SIMPLE_JWT = {
     "ROTATE_REFRESH_TOKENS": True,
 }
 
-# Email Configuration (generic SMTP)
+
+# =============================================================================
+# EMAIL CONFIGURATION
+# =============================================================================
+
 EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
 EMAIL_HOST = config("EMAIL_HOST", default="smtp.gmail.com")
 EMAIL_PORT = config("EMAIL_PORT", cast=int, default=587)
@@ -160,57 +222,82 @@ EMAIL_HOST_USER = config("EMAIL_HOST_USER", default="")
 EMAIL_HOST_PASSWORD = config("EMAIL_HOST_PASSWORD", default="")
 DEFAULT_FROM_EMAIL = config("DEFAULT_FROM_EMAIL", default="no-reply@valunds.com")
 
-# Security Settings
+
+# =============================================================================
+# SECURITY CONFIGURATION
+# =============================================================================
+
+# Content Security Policy
 CSP_DEFAULT_SRC = ("'self'",)
 CSP_IMG_SRC = ("'self'", "data:", "blob:", "*.cloudinary.com")
 
-# Axes Configuration
+# Axes (Brute Force Protection)
 AXES_FAILURE_LIMIT = config("AXES_FAILURE_LIMIT", cast=int, default=5)
 
-# Localization
-LOCALE_PATHS = [BASE_DIR / "locale"]
+# CSRF Protection
+CSRF_TRUSTED_ORIGINS = config(
+    "CSRF_TRUSTED_ORIGINS", cast=Csv(), default="http://localhost,https://localhost"
+)
 
-# Model Configuration
-DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+
+# =============================================================================
+# AUTHENTICATION & USER MODEL CONFIGURATION
+# =============================================================================
 
 # Custom User Model
 AUTH_USER_MODEL = "accounts.User"
 
-# Authentication backends (needed for django-allauth)
+# Authentication Backends
 AUTHENTICATION_BACKENDS = (
     "django.contrib.auth.backends.ModelBackend",
     "allauth.account.auth_backends.AuthenticationBackend",
 )
 
-# Allauth / dj-rest-auth (email-first)
+
+# =============================================================================
+# DJANGO-ALLAUTH CONFIGURATION
+# =============================================================================
+
+# Account Settings
 ACCOUNT_AUTHENTICATION_METHOD = "email"
 ACCOUNT_EMAIL_REQUIRED = True
 ACCOUNT_USERNAME_REQUIRED = False
 ACCOUNT_EMAIL_VERIFICATION = "optional"
 ACCOUNT_ADAPTER = "allauth.account.adapter.DefaultAccountAdapter"
-
-# dj-rest-auth → use the canonical flag name
-REST_USE_JWT = True
-
-# Let allauth know there is no username field on the custom user
 ACCOUNT_USER_MODEL_USERNAME_FIELD = None
 
-# dj-rest-auth serializers
+# Social Account Providers
+SOCIALACCOUNT_PROVIDERS = {
+    "google": {
+        "APP": {
+            "client_id": config("GOOGLE_CLIENT_ID", default=""),
+            "secret": config("GOOGLE_CLIENT_SECRET", default=""),
+            "key": "",
+        },
+        "SCOPE": ["profile", "email"],
+        "AUTH_PARAMS": {"access_type": "offline"},
+    },
+    "github": {
+        "APP": {
+            "client_id": config("GITHUB_CLIENT_ID", default=""),
+            "secret": config("GITHUB_CLIENT_SECRET", default=""),
+            "key": "",
+        },
+        "SCOPE": ["user:email"],
+    },
+}
+
+
+# =============================================================================
+# DJ-REST-AUTH CONFIGURATION
+# =============================================================================
+
+REST_USE_JWT = True
+
+# Custom Serializers
 REST_AUTH_REGISTER_SERIALIZERS = {
     "REGISTER_SERIALIZER": "apps.accounts.serializers.CustomRegisterSerializer",
 }
 REST_AUTH_SERIALIZERS = {
     "USER_DETAILS_SERIALIZER": "apps.accounts.serializers.UserSerializer",
 }
-
-# CSRF trusted origins (add your frontend URL(s) in .env)
-CSRF_TRUSTED_ORIGINS = config(
-    "CSRF_TRUSTED_ORIGINS", cast=Csv(), default="http://localhost,https://localhost"
-)
-
-# (Optional but recommended) If you'll be behind a proxy/ingress in prod
-# SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
-# SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
-# SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
-# SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
-# SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
