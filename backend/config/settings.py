@@ -16,9 +16,7 @@ config = Config(RepositoryEnv(str(env_path))) if env_path.exists() else base_con
 # Core Settings
 SECRET_KEY = config("DJANGO_SECRET_KEY")
 DEBUG = config("DJANGO_DEBUG", cast=bool, default=False)
-ALLOWED_HOSTS = config(
-    "DJANGO_ALLOWED_HOSTS", cast=Csv(), default="localhost,127.0.0.1"
-)
+ALLOWED_HOSTS = config("DJANGO_ALLOWED_HOSTS", cast=Csv(), default="localhost,127.0.0.1")
 
 # Applications
 INSTALLED_APPS = [
@@ -41,7 +39,6 @@ INSTALLED_APPS = [
     "drf_spectacular",
     "axes",
     "ratelimit",
-    "anymail",
     "cloudinary",
     "cloudinary_storage",
     "apps.core",
@@ -122,9 +119,7 @@ MEDIA_URL = "/media/"
 MEDIA_ROOT = BASE_DIR / "media"
 
 STORAGES = {
-    "staticfiles": {
-        "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage"
-    },
+    "staticfiles": {"BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage"},
     "default": {"BACKEND": "cloudinary_storage.storage.MediaCloudinaryStorage"},
 }
 
@@ -140,9 +135,7 @@ REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": (
         "rest_framework_simplejwt.authentication.JWTAuthentication",
     ),
-    "DEFAULT_PERMISSION_CLASSES": (
-        "rest_framework.permissions.IsAuthenticatedOrReadOnly",
-    ),
+    "DEFAULT_PERMISSION_CLASSES": ("rest_framework.permissions.IsAuthenticatedOrReadOnly",),
     "DEFAULT_FILTER_BACKENDS": ["django_filters.rest_framework.DjangoFilterBackend"],
     "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
 }
@@ -157,12 +150,14 @@ SIMPLE_JWT = {
     "ROTATE_REFRESH_TOKENS": True,
 }
 
-# Email Configuration
-ANYMAIL = {
-    "MAILGUN_API_KEY": config("MAILGUN_API_KEY", default=""),
-    "MAILGUN_SENDER_DOMAIN": config("MAILGUN_SENDER_DOMAIN", default=""),
-}
-EMAIL_BACKEND = "anymail.backends.mailgun.EmailBackend"
+# Email Configuration (generic SMTP)
+EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
+EMAIL_HOST = config("EMAIL_HOST", default="smtp.gmail.com")
+EMAIL_PORT = config("EMAIL_PORT", cast=int, default=587)
+EMAIL_USE_TLS = config("EMAIL_USE_TLS", cast=bool, default=True)
+EMAIL_HOST_USER = config("EMAIL_HOST_USER", default="")
+EMAIL_HOST_PASSWORD = config("EMAIL_HOST_PASSWORD", default="")
+DEFAULT_FROM_EMAIL = config("DEFAULT_FROM_EMAIL", default="no-reply@valunds.com")
 
 # Security Settings
 CSP_DEFAULT_SRC = ("'self'",)
@@ -178,4 +173,5 @@ LOCALE_PATHS = [BASE_DIR / "locale"]
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 # Custom User Model
+# AUTH_USER_MODEL = "accounts.User"
 # AUTH_USER_MODEL = "accounts.User"

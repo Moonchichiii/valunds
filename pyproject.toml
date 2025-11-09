@@ -1,0 +1,23 @@
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+extend-select = ["I", "UP", "B", "SIM", "DTZ"]
+exclude = [
+  "frontend/node_modules",
+  "frontend/dist",
+  "backend/migrations",
+  ".venv",
+  "**/__pycache__",
+  ".ruff_cache",
+  ".pytest_cache",
+]
+
+[tool.ruff.lint.isort]
+known-first-party = ["apps", "config"]
+combine-as-imports = true
+
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"
+line-ending = "lf"
+docstring-code-format = true
