@@ -11,11 +11,13 @@ djangorestframework-simplejwt
 # SECURITY / ABUSE PREVENTION
 django-axes
 django-ratelimit
-cryptography
+cryptography>=42.0.0
+django-cryptography-5>=2.0.3
 
 # AUTHENTICATION
-django-allauth
+django-allauth[mfa,socialaccount]>=65.13.0
 dj-rest-auth
+qrcode >= 7.0.0
 
 # MEDIA & STORAGE (Cloudinary)
 cloudinary

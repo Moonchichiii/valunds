@@ -6,7 +6,7 @@ from datetime import timedelta
 import os
 from pathlib import Path
 
-from decouple import Config, Csv, RepositoryEnv, config as base_config
+from decouple import Config, Csv, RepositoryEnv
 import dj_database_url
 
 
@@ -18,7 +18,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 DJANGO_ENV = os.getenv("DJANGO_ENV", "dev")
 env_path = BASE_DIR / f".env.{DJANGO_ENV}"
-config = Config(RepositoryEnv(str(env_path))) if env_path.exists() else base_config
+config = Config(RepositoryEnv(str(env_path)))
 
 
 # =============================================================================
@@ -60,14 +60,15 @@ INSTALLED_APPS = [
     "corsheaders",
     "rest_framework",
     "rest_framework_simplejwt",
+    "rest_framework_simplejwt.token_blacklist",
     "django_filters",
     "drf_spectacular",
     "drf_spectacular_sidecar",
     # Third Party Apps - Security & Storage
     "axes",
-    "ratelimit",
     "cloudinary",
     "cloudinary_storage",
+    "django_cryptography",
     # Local Apps
     "apps.core",
     "apps.accounts",
@@ -99,7 +100,7 @@ MIDDLEWARE = [
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
-    "allauth.account.middleware.AccountMiddleware",  # Required for django-allauth
+    "allauth.account.middleware.AccountMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
     "axes.middleware.AxesMiddleware",
@@ -127,7 +128,7 @@ TEMPLATES = [
 
 
 # =============================================================================
-# DATABASE CONFIGURATION
+# DATABASE CONFIGURATION & Cache Settings
 # =============================================================================
 
 DATABASE_URL = config("DATABASE_URL", default="")
@@ -141,6 +142,30 @@ else:
         }
     }
 
+REDIS_URL = config("REDIS_URL", default="")
+
+if REDIS_URL:
+    CACHES = {
+        "default": {
+            "BACKEND": "django_redis.cache.RedisCache",
+            "LOCATION": REDIS_URL,
+            "OPTIONS": {"CLIENT_CLASS": "django_redis.client.DefaultClient"},
+            "KEY_PREFIX": "valund",
+        }
+    }
+else:
+    CACHES = {
+        "default": {
+            "BACKEND": "django.core.cache.backends.locmem.LocMemCache",
+            "LOCATION": "valund-local",
+        }
+    }
+
+
+RATELIMIT_ENABLE = True
+RATELIMIT_USE_CACHE = "default"
+RATELIMIT_CACHE_PREFIX = "rl:"
+# RATELIMIT_VIEW = "apps.api.views.ratelimited"  # only for middleware-based global blocking
 
 # =============================================================================
 # INTERNATIONALIZATION & LOCALIZATION
@@ -175,7 +200,11 @@ CLOUDINARY_URL = config("CLOUDINARY_URL", default="")
 # CORS CONFIGURATION
 # =============================================================================
 
-CORS_ALLOWED_ORIGINS = config("CORS_ALLOWED_ORIGINS", cast=Csv(), default="")
+CORS_ALLOWED_ORIGINS = config(
+    "CORS_ALLOWED_ORIGINS",
+    cast=Csv(),
+    default="http://localhost:5173,https://valunds.se,https://www.valunds.se",
+)
 CORS_ALLOW_CREDENTIALS = True
 
 
@@ -192,10 +221,46 @@ REST_FRAMEWORK = {
     "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
     "DEFAULT_PAGINATION_CLASS": "apps.core.pagination.DefaultPagination",
     "PAGE_SIZE": 20,
+    "DEFAULT_THROTTLE_CLASSES": [
+        "rest_framework.throttling.AnonRateThrottle",
+        "rest_framework.throttling.UserRateThrottle",
+        "rest_framework.throttling.ScopedRateThrottle",
+    ],
+    "DEFAULT_THROTTLE_RATES": {
+        "anon": "60/min",
+        "user": "300/min",
+        # Scoped:
+        "me": "60/min",
+        "profile": "30/min",
+        "auth": "20/min",
+        "dj_rest_auth": "20/min",
+        "login": "15/min",
+        "password_reset": "5/min",
+    },
+    "DEFAULT_RENDERER_CLASSES": ("rest_framework.renderers.JSONRenderer",),
+    "EXCEPTION_HANDLER": "apps.core.exceptions.problem_exception_handler",
 }
 
+if DEBUG:
+    # Nice to have the browsable API in dev only
+    REST_FRAMEWORK["DEFAULT_RENDERER_CLASSES"] = (
+        *REST_FRAMEWORK["DEFAULT_RENDERER_CLASSES"],
+        "rest_framework.renderers.BrowsableAPIRenderer",
+    )
+
+
 # API Documentation
-SPECTACULAR_SETTINGS = {"TITLE": "Valund API", "VERSION": "0.1.0"}
+SPECTACULAR_SETTINGS = {
+    "TITLE": "Valund API",
+    "VERSION": "0.1.0",
+    "SERVERS": [{"url": "/api"}],
+    "SECURITY": [{"bearerAuth": []}],
+    "COMPONENTS": {
+        "securitySchemes": {
+            "bearerAuth": {"type": "http", "scheme": "bearer", "bearerFormat": "JWT"}
+        }
+    },
+}
 
 
 # =============================================================================
@@ -207,6 +272,7 @@ SIMPLE_JWT = {
     "ACCESS_TOKEN_LIFETIME": timedelta(minutes=30),
     "REFRESH_TOKEN_LIFETIME": timedelta(days=7),
     "ROTATE_REFRESH_TOKENS": True,
+    "BLACKLIST_AFTER_ROTATION": True,
 }
 
 
@@ -215,13 +281,14 @@ SIMPLE_JWT = {
 # =============================================================================
 
 EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
-EMAIL_HOST = config("EMAIL_HOST", default="smtp.gmail.com")
-EMAIL_PORT = config("EMAIL_PORT", cast=int, default=587)
-EMAIL_USE_TLS = config("EMAIL_USE_TLS", cast=bool, default=True)
+EMAIL_HOST = config("EMAIL_HOST", default="send.one.com")
+EMAIL_PORT = config("EMAIL_PORT", cast=int, default=465)
+EMAIL_USE_SSL = config("EMAIL_USE_SSL", cast=bool, default=True)
+EMAIL_USE_TLS = config("EMAIL_USE_TLS", cast=bool, default=False)
 EMAIL_HOST_USER = config("EMAIL_HOST_USER", default="")
 EMAIL_HOST_PASSWORD = config("EMAIL_HOST_PASSWORD", default="")
-DEFAULT_FROM_EMAIL = config("DEFAULT_FROM_EMAIL", default="no-reply@valunds.com")
-
+DEFAULT_FROM_EMAIL = config("DEFAULT_FROM_EMAIL", default="Valunds <kontakt@valunds.se>")
+SERVER_EMAIL = config("SERVER_EMAIL", default="errors@valunds.se")
 
 # =============================================================================
 # SECURITY CONFIGURATION
@@ -229,15 +296,50 @@ DEFAULT_FROM_EMAIL = config("DEFAULT_FROM_EMAIL", default="no-reply@valunds.com"
 
 # Content Security Policy
 CSP_DEFAULT_SRC = ("'self'",)
+CSP_SCRIPT_SRC = ("'self'",)
+CSP_STYLE_SRC = ("'self'", "'unsafe-inline'")
 CSP_IMG_SRC = ("'self'", "data:", "blob:", "*.cloudinary.com")
 
 # Axes (Brute Force Protection)
+AXES_ENABLED = True
 AXES_FAILURE_LIMIT = config("AXES_FAILURE_LIMIT", cast=int, default=5)
+AXES_COOLOFF_TIME = timedelta(hours=1)
+AXES_LOCK_OUT_AT_FAILURE = True
+AXES_RESET_ON_SUCCESS = True
+AXES_USERNAME_FORM_FIELD = "email"
 
 # CSRF Protection
 CSRF_TRUSTED_ORIGINS = config(
-    "CSRF_TRUSTED_ORIGINS", cast=Csv(), default="http://localhost,https://localhost"
+    "CSRF_TRUSTED_ORIGINS",
+    cast=Csv(),
+    default="http://localhost:5173,https://valunds.se,https://www.valunds.se",
 )
+
+# Cookie SameSite settings
+SESSION_COOKIE_SAMESITE = "Lax"
+CSRF_COOKIE_SAMESITE = "Lax"
+
+# Environment-specific security settings
+if not DEBUG:
+    SESSION_COOKIE_SECURE = True
+    CSRF_COOKIE_SECURE = True
+    SECURE_SSL_REDIRECT = True
+    SECURE_HSTS_SECONDS = 31536000
+    SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+    SECURE_HSTS_PRELOAD = True
+else:
+    SESSION_COOKIE_SECURE = False
+    CSRF_COOKIE_SECURE = False
+    SECURE_SSL_REDIRECT = False
+    SECURE_HSTS_SECONDS = 0
+    SECURE_HSTS_INCLUDE_SUBDOMAINS = False
+    SECURE_HSTS_PRELOAD = False
+
+# Common security headers
+SECURE_BROWSER_XSS_FILTER = True
+SECURE_CONTENT_TYPE_NOSNIFF = True
+SECURE_REFERRER_POLICY = "same-origin"
+SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")  # if behind proxy
 
 
 # =============================================================================
@@ -247,24 +349,58 @@ CSRF_TRUSTED_ORIGINS = config(
 # Custom User Model
 AUTH_USER_MODEL = "accounts.User"
 
+# Password Validators
+AUTH_PASSWORD_VALIDATORS = [
+    {"NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator"},
+    {
+        "NAME": "django.contrib.auth.password_validation.MinimumLengthValidator",
+        "OPTIONS": {"min_length": 8},
+    },
+    {"NAME": "django.contrib.auth.password_validation.CommonPasswordValidator"},
+    {"NAME": "django.contrib.auth.password_validation.NumericPasswordValidator"},
+]
+
 # Authentication Backends
 AUTHENTICATION_BACKENDS = (
+    "axes.backends.AxesStandaloneBackend",
     "django.contrib.auth.backends.ModelBackend",
     "allauth.account.auth_backends.AuthenticationBackend",
 )
-
 
 # =============================================================================
 # DJANGO-ALLAUTH CONFIGURATION
 # =============================================================================
 
-# Account Settings
+# ---- Compatibility flags for dj-rest-auth (keep these for backwards support) ----
 ACCOUNT_AUTHENTICATION_METHOD = "email"
 ACCOUNT_EMAIL_REQUIRED = True
 ACCOUNT_USERNAME_REQUIRED = False
-ACCOUNT_EMAIL_VERIFICATION = "optional"
-ACCOUNT_ADAPTER = "allauth.account.adapter.DefaultAccountAdapter"
+
+# ---- Modern allauth configuration ----
 ACCOUNT_USER_MODEL_USERNAME_FIELD = None
+ACCOUNT_LOGIN_METHODS = {"email"}
+ACCOUNT_PREVENT_ENUMERATION = True
+
+# Signup Configuration
+ACCOUNT_SIGNUP_FIELDS = ["email*", "password1*", "password2*"]
+
+# Email Verification
+ACCOUNT_EMAIL_VERIFICATION = "mandatory"
+ACCOUNT_UNIQUE_EMAIL = True
+ACCOUNT_EMAIL_SUBJECT_PREFIX = "[Valunds] "
+
+# Environment-specific protocol settings
+if DJANGO_ENV == "dev":
+    ACCOUNT_DEFAULT_HTTP_PROTOCOL = "http"
+else:
+    ACCOUNT_DEFAULT_HTTP_PROTOCOL = "https"
+
+# Optional UX: redirect URLs for email confirmation
+ACCOUNT_EMAIL_CONFIRMATION_AUTHENTICATED_REDIRECT_URL = "/"
+ACCOUNT_EMAIL_CONFIRMATION_ANONYMOUS_REDIRECT_URL = "/"
+
+# W001 on some allauth versions
+SILENCED_SYSTEM_CHECKS = ["account.W001"]
 
 # Social Account Providers
 SOCIALACCOUNT_PROVIDERS = {
@@ -292,7 +428,11 @@ SOCIALACCOUNT_PROVIDERS = {
 # DJ-REST-AUTH CONFIGURATION
 # =============================================================================
 
-REST_USE_JWT = True
+REST_AUTH = {
+    "USE_JWT": True,
+    "TOKEN_MODEL": None,
+    "SESSION_LOGIN": False,
+}
 
 # Custom Serializers
 REST_AUTH_REGISTER_SERIALIZERS = {

@@ -1,3 +1,4 @@
+from allauth.account.models import EmailAddress
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin as DjangoUserAdmin
 
@@ -7,17 +8,25 @@ from .models import User
 @admin.register(User)
 class UserAdmin(DjangoUserAdmin):
     model = User
-    list_display = ("email", "role", "is_active", "is_staff", "date_joined")
-    ordering = ("email",)
+    list_display = (
+        "email",
+        "primary_verified",
+        "role",
+        "is_active",
+        "is_staff",
+        "is_superuser",
+        "date_joined",
+    )
+    list_filter = ("role", "is_active", "is_staff", "is_superuser")
+    ordering = ("-date_joined",)
     search_fields = ("email", "first_name", "last_name")
     fieldsets = (
-        (None, {"fields": ("email", "password")}),
+        (None, {"fields": ("email", "password", "role")}),
         ("Personal info", {"fields": ("first_name", "last_name")}),
         (
             "Permissions",
             {
                 "fields": (
-                    "role",
                     "is_active",
                     "is_staff",
                     "is_superuser",
@@ -29,5 +38,18 @@ class UserAdmin(DjangoUserAdmin):
         ("Important dates", {"fields": ("last_login", "date_joined")}),
     )
     add_fieldsets = (
-        (None, {"classes": ("wide",), "fields": ("email", "password1", "password2", "role")}),
+        (
+            None,
+            {
+                "classes": ("wide",),
+                "fields": ("email", "password1", "password2", "role", "is_staff", "is_superuser"),
+            },
+        ),
     )
+
+    @admin.display(boolean=True, description="Email verified")
+    def primary_verified(self, obj):
+        try:
+            return EmailAddress.objects.get(user=obj, primary=True).verified
+        except EmailAddress.DoesNotExist:
+            return False

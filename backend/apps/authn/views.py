@@ -1,3 +1,9 @@
-from django.shortcuts import render
+from dj_rest_auth.views import LoginView, PasswordResetView
 
-# Create your views here.
+
+class ThrottledLoginView(LoginView):
+    throttle_scope = "login"
+
+
+class ThrottledPasswordResetView(PasswordResetView):
+    throttle_scope = "password_reset"
