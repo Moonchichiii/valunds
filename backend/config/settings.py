@@ -200,10 +200,13 @@ CLOUDINARY_URL = config("CLOUDINARY_URL", default="")
 # CORS CONFIGURATION
 # =============================================================================
 
+# Frontend base (env-driven)
+FRONTEND_URL = config("FRONTEND_URL", default="http://localhost:5173")
+
 CORS_ALLOWED_ORIGINS = config(
     "CORS_ALLOWED_ORIGINS",
     cast=Csv(),
-    default="http://localhost:5173,https://valunds.se,https://www.valunds.se",
+    default=f"{FRONTEND_URL},https://valunds.se,https://www.valunds.se",
 )
 CORS_ALLOW_CREDENTIALS = True
 
@@ -232,8 +235,6 @@ REST_FRAMEWORK = {
         # Scoped:
         "me": "60/min",
         "profile": "30/min",
-        "auth": "20/min",
-        "dj_rest_auth": "20/min",
         "login": "15/min",
         "password_reset": "5/min",
     },
@@ -312,7 +313,7 @@ AXES_USERNAME_FORM_FIELD = "email"
 CSRF_TRUSTED_ORIGINS = config(
     "CSRF_TRUSTED_ORIGINS",
     cast=Csv(),
-    default="http://localhost:5173,https://valunds.se,https://www.valunds.se",
+    default=f"{FRONTEND_URL},https://valunds.se,https://www.valunds.se",
 )
 
 # Cookie SameSite settings
@@ -389,15 +390,12 @@ ACCOUNT_EMAIL_VERIFICATION = "mandatory"
 ACCOUNT_UNIQUE_EMAIL = True
 ACCOUNT_EMAIL_SUBJECT_PREFIX = "[Valunds] "
 
-# Environment-specific protocol settings
-if DJANGO_ENV == "dev":
-    ACCOUNT_DEFAULT_HTTP_PROTOCOL = "http"
-else:
-    ACCOUNT_DEFAULT_HTTP_PROTOCOL = "https"
+# Protocol for allauth-generated links
+ACCOUNT_DEFAULT_HTTP_PROTOCOL = "http" if DJANGO_ENV == "dev" else "https"
 
-# Optional UX: redirect URLs for email confirmation
-ACCOUNT_EMAIL_CONFIRMATION_AUTHENTICATED_REDIRECT_URL = "/"
-ACCOUNT_EMAIL_CONFIRMATION_ANONYMOUS_REDIRECT_URL = "/"
+# Redirects after email confirmation (SPA handles the UX)
+ACCOUNT_EMAIL_CONFIRMATION_ANONYMOUS_REDIRECT_URL = f"{FRONTEND_URL}/auth/verified"
+ACCOUNT_EMAIL_CONFIRMATION_AUTHENTICATED_REDIRECT_URL = f"{FRONTEND_URL}/app"
 
 # W001 on some allauth versions
 SILENCED_SYSTEM_CHECKS = ["account.W001"]
