@@ -1,4 +1,5 @@
 from core.ai_proxy import passport_to_anonymized_profile
+from valund.core.ai_proxy import passport_to_anonymized_profile
 
 
 def test_passport_to_anonymized_profile_redacts_sensitive_fields() -> None:
