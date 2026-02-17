@@ -2,7 +2,7 @@
 name = "valund"
 version = "0.1.0"
 
-description = "Nordic Competence Marketplace — High-Trust Infrastructure"
+description="Nordic Competence Marketplace — High-Trust Infrastructure"
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
