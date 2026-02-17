@@ -13,6 +13,8 @@ CHECKS: dict[str, dict[str, int]] = {
         "credential_verify_tier3": 1,
         "credential_audit_expiry": 1,
     },
+    "apps/passports/selectors.py": {"get_passport_data": 1},
+    "apps/passports/services.py": {"credential_verify_tier3": 1},
 }
 
 
