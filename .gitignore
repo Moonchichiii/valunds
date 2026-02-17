@@ -2,6 +2,12 @@
 __pycache__/
 *.py[cod]
 *$py.class
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.so
 .venv/
 .pytest_cache/
 .mypy_cache/
@@ -22,3 +28,9 @@ dist/
 .DS_Store
 .idea/
 .vscode/*.log
+# Node
+node_modules/
+
+# Local
+.env
+.DS_Store

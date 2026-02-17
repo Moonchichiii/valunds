@@ -6,11 +6,18 @@
   "scripts": {
     "build:css": "bun build static/css/index.css --outdir static/dist --minify && bun -e \"import {readFileSync, writeFileSync} from 'node:fs'; import {brotliCompressSync} from 'node:zlib'; const inPath='static/dist/index.css'; const outPath='static/dist/index.css.br'; writeFileSync(outPath, brotliCompressSync(readFileSync(inPath)));\"",
     "watch:css": "bun build static/css/index.css --outdir static/dist --watch --minify"
+    "build:css": "bun build static/css/index.css --outdir static/dist",
+    "watch:css": "bun build static/css/index.css --outdir static/dist --watch"
+    "build:css": "tailwindcss -i ./assets/input.css -o ./assets/output.css --minify",
+    "watch:css": "tailwindcss -i ./assets/input.css -o ./assets/output.css --watch"
   },
   "dependencies": {
     "htmx.org": "^2.0.4"
   },
   "devDependencies": {
     "tailwindcss": "^4.0.0"
+    "autoprefixer": "^10.4.20",
+    "postcss": "^8.4.49",
+    "tailwindcss": "^3.4.16"
   }
 }

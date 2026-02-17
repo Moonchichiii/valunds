@@ -1,4 +1,3 @@
-from core.models import BaseModel
 from django.contrib.auth.models import AbstractUser
 from django.db import models
 
@@ -9,7 +8,6 @@ class UserRole(models.TextChoices):
     ADMIN = "admin", "Admin"
 
 
-class CustomUser(BaseModel, AbstractUser):
 class CustomUser(AbstractUser):
     role = models.CharField(
         max_length=20,
