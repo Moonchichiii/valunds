@@ -1,10 +1,14 @@
 """Base Django settings shared across environments."""
 
+import sys
 from pathlib import Path
 
 import environ
 
 BASE_DIR = Path(__file__).resolve().parent.parent.parent
+sys.path.insert(0, str(BASE_DIR / "apps"))
+
+env = environ.Env()
 
 env = environ.Env()
 
@@ -30,6 +34,10 @@ THIRD_PARTY_APPS = [
 ]
 
 LOCAL_APPS = [
+    "accounts",
+    "core",
+    "passports",
+    "bookings",
     "valund.accounts",
     "valund.core",
     "valund.passports",

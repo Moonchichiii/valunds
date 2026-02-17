@@ -1,3 +1,4 @@
+from core.ai_proxy import passport_to_anonymized_profile
 from valund.core.ai_proxy import passport_to_anonymized_profile
 
 
