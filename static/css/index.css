@@ -1,0 +1,21 @@
+@import "tailwindcss";
+
+@theme {
+  --color-valund-snow: #F9FAFB;
+  --color-valund-birch: #F4F1EA;
+  --color-valund-fjord: #5B7C88;
+  --color-valund-moss: #7D8C71;
+  --color-valund-slate: #2C3E50;
+
+  --font-sans: "Inter", "system-ui", "sans-serif";
+  --font-serif: "Akzidenz-Grotesk", "serif";
+
+  --radius-nordic: 2px;
+  --shadow-soft: 0 2px 15px -3px rgba(44, 62, 80, 0.04);
+}
+
+@layer base {
+  body {
+    @apply bg-valund-snow text-valund-slate antialiased;
+  }
+}
