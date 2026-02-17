@@ -44,6 +44,9 @@ class CompetencePassport(BaseModel):
     def full_name(self) -> str:
         return self.user.get_full_name() or self.user.username
 
+    headline = models.CharField(max_length=255)
+    summary = models.TextField(blank=True)
+
     def __str__(self) -> str:
         return f"Passport<{self.user_id}> tier={self.verification_tier}"
 
