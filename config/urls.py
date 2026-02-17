@@ -9,6 +9,7 @@ urlpatterns = [
     path("admin/", admin.site.urls),
     path("", include("core.urls")),
     path("passports/", include("passports.urls")),
+    path("profiles/", include("profiles.urls")),
     path("", include("valund.core.urls")),
     path("passports/", include("valund.passports.urls")),
 ]

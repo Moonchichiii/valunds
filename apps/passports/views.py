@@ -15,6 +15,13 @@ class PassportDetailView(View):
             return HttpResponse("passport-not-found", status=404)
 
         if request.headers.get("HX-Request") == "true":
+            return HttpResponse(
+                "passport:{id}:{sector}".format(
+                    id=payload["id"],
+                    sector=payload["sector"],
+                )
+            )
+        return JsonResponse(payload)
             passport_id = payload["id"]
             verification_tier = payload["verification_tier"]
             return HttpResponse(f"passport:{passport_id}:{verification_tier}")

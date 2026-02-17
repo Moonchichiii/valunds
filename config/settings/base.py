@@ -42,6 +42,8 @@ LOCAL_APPS = [
     "accounts",
     "core",
     "passports",
+    "profiles",
+    "bookings",
     "bookings",
     "valund.accounts",
     "valund.core",
