@@ -1,0 +1,17 @@
+{
+  "name": "valund-frontend",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "build:css": "tailwindcss -i ./assets/css/input.css -o ./assets/css/output.css --minify",
+    "watch:css": "tailwindcss -i ./assets/css/input.css -o ./assets/css/output.css --watch"
+  },
+  "dependencies": {
+    "htmx.org": "^2.0.4"
+  },
+  "devDependencies": {
+    "autoprefixer": "^10.4.20",
+    "postcss": "^8.4.47",
+    "tailwindcss": "^3.4.13"
+  }
+}
