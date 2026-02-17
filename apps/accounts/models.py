@@ -3,18 +3,16 @@ from django.contrib.auth.models import AbstractUser
 from django.db import models
 
 
-class UserRole(models.TextChoices):
-    FREELANCER = "freelancer", "Freelancer"
-    CLIENT = "client", "Client"
-    ADMIN = "admin", "Admin"
-
-
 class CustomUser(BaseModel, AbstractUser):
     role = models.CharField(
         max_length=20,
-        choices=UserRole.choices,
-        default=UserRole.FREELANCER,
+        choices=[
+            ("freelancer", "Freelancer"),
+            ("client", "Client"),
+            ("admin", "Admin"),
+        ],
+        default="freelancer",
     )
 
-    def __str__(self) -> str:
-        return f"{self.username} ({self.role})"
+    class Meta:
+        db_table = "auth_user"

@@ -8,11 +8,8 @@ from pathlib import Path
 CHECKS: dict[str, dict[str, int]] = {
     "apps/accounts/models.py": {"CustomUser": 1},
     "apps/passports/models.py": {"CompetencePassport": 1, "Credential": 1},
-    "apps/passports/selectors.py": {"get_passport_context": 1},
-    "apps/passports/services.py": {
-        "credential_verify_tier3": 1,
-        "credential_audit_expiry": 1,
-    },
+    "apps/passports/selectors.py": {"get_passport_data": 1},
+    "apps/passports/services.py": {"credential_verify_tier3": 1},
 }
 
 
