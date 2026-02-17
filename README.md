@@ -14,7 +14,6 @@ bun install
 
 # Developer guardrails
 uv run pre-commit install
-uv run python manage.py check --settings=config.settings.local
 uv run ruff check .
 uv run mypy .
 ```
