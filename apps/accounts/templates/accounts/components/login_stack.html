@@ -1,0 +1,123 @@
+<section class="identity-login-stack" aria-labelledby="nordic-login-heading">
+  <div class="identity-login-stack__intro">
+    <p class="identity-login-stack__eyebrow">Trusted Nordic Access</p>
+    <h2 id="nordic-login-heading">Identity Hub Sign-In</h2>
+    <p>Use your national eID for instant verified access across Valund services.</p>
+  </div>
+
+  <div class="identity-login-stack__actions" role="list" aria-label="Nordic identity providers">
+    <a class="idp-button idp-button--bankid" href="#" role="listitem" aria-label="Continue with BankID for Sweden or Norway">
+      <span class="idp-button__name">BankID</span>
+      <span class="idp-button__meta">Sweden and Norway</span>
+    </a>
+
+    <a class="idp-button idp-button--mitid" href="#" role="listitem" aria-label="Continue with MitID for Denmark">
+      <span class="idp-button__name">MitID</span>
+      <span class="idp-button__meta">Denmark</span>
+    </a>
+
+    <a class="idp-button idp-button--ftn" href="#" role="listitem" aria-label="Continue with Finnish Trust Network for Finland">
+      <span class="idp-button__name">FTN</span>
+      <span class="idp-button__meta">Finland</span>
+    </a>
+  </div>
+</section>
+
+<style>
+  :root {
+    --fjord-blue: #0d4d6f;
+    --fjord-blue-deep: #083652;
+    --birch-wood: #dfc8a4;
+    --birch-wood-soft: #f4ece0;
+    --ice-white: #f9fbfd;
+    --slate-ink: #1f2a33;
+  }
+
+  .identity-login-stack {
+    max-width: 32rem;
+    margin: 1.25rem auto;
+    padding: 1.5rem;
+    border-radius: 1rem;
+    background: linear-gradient(140deg, var(--ice-white), var(--birch-wood-soft));
+    border: 1px solid rgba(13, 77, 111, 0.14);
+    box-shadow: 0 16px 40px rgba(8, 54, 82, 0.12);
+    color: var(--slate-ink);
+  }
+
+  .identity-login-stack__intro h2 {
+    margin: 0.2rem 0 0.5rem;
+    color: var(--fjord-blue-deep);
+  }
+
+  .identity-login-stack__eyebrow {
+    margin: 0;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    font-size: 0.75rem;
+    color: var(--fjord-blue);
+    font-weight: 700;
+  }
+
+  .identity-login-stack__intro p {
+    margin: 0;
+    line-height: 1.45;
+  }
+
+  .identity-login-stack__actions {
+    margin-top: 1.25rem;
+    display: grid;
+    gap: 0.75rem;
+  }
+
+  .idp-button {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.85rem 1rem;
+    border-radius: 0.75rem;
+    color: var(--ice-white);
+    text-decoration: none;
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+  }
+
+  .idp-button:hover,
+  .idp-button:focus-visible {
+    transform: translateY(-1px);
+    box-shadow: 0 8px 18px rgba(8, 54, 82, 0.22);
+    outline: none;
+  }
+
+  .idp-button__name {
+    font-weight: 700;
+  }
+
+  .idp-button__meta {
+    font-size: 0.84rem;
+    color: rgba(249, 251, 253, 0.86);
+  }
+
+  .idp-button--bankid {
+    background: linear-gradient(135deg, #11577c, #0b4063);
+  }
+
+  .idp-button--mitid {
+    background: linear-gradient(135deg, #23607b, #1a4559);
+  }
+
+  .idp-button--ftn {
+    background: linear-gradient(135deg, #0d4d6f, #0a3954);
+  }
+
+  @media (max-width: 640px) {
+    .identity-login-stack {
+      margin: 0.75rem;
+      padding: 1rem;
+    }
+
+    .idp-button {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+  }
+</style>
