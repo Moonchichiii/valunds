@@ -24,6 +24,8 @@ uv run pre-commit install
 uv run python manage.py check --settings=config.settings.local
 uv run ruff check . --fix
 uv run mypy apps
+uv run ruff check .
+uv run mypy .
 ```
 
 ## GitHub governance bootstrap (optional)
