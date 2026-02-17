@@ -22,6 +22,9 @@ dependencies = [
   "django-cors-headers>=4.4",
 ]
 
+[tool.uv]
+package = false  # CRITICAL: Prevents the "Failed to build valund" error
+
 [project.optional-dependencies]
 dev = [
   "ruff>=0.8.0",
