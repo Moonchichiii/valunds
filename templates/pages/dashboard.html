@@ -1,0 +1,26 @@
+{% extends "layouts/app_shell.html" %}
+
+{% block app_title %}Dashboard{% endblock %}
+
+{% block app_content %}
+<div class="grid grid-cols-1 gap-6 md:grid-cols-2">
+  <div
+    class="rounded-nordic border border-valund-slate/10 bg-white p-4 shadow-soft"
+    hx-get="/profiles/me/identity-card/"
+    hx-trigger="load"
+    hx-target="this"
+    hx-swap="morph"
+  >
+    Loading profile...
+  </div>
+  <div
+    class="rounded-nordic border border-valund-slate/10 bg-white p-4 shadow-soft"
+    hx-get="/passports/me/badge/"
+    hx-trigger="load"
+    hx-target="this"
+    hx-swap="morph"
+  >
+    Loading passport status...
+  </div>
+</div>
+{% endblock %}

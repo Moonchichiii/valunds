@@ -1,0 +1,25 @@
+<div class="bg-white border border-valund-slate/5 p-6 rounded-nordic shadow-soft">
+  <div class="flex items-center justify-between">
+    <div class="flex items-center space-x-4">
+      <div class="w-12 h-12 bg-valund-birch rounded-full overflow-hidden">
+        {% if profile.avatar %}
+          <img src="{{ profile.avatar.url }}" alt="{{ profile.display_name }}">
+        {% else %}
+          <div class="flex items-center justify-center h-full text-valund-fjord font-bold">
+            {{ profile.display_name|slice:":1" }}
+          </div>
+        {% endif %}
+      </div>
+      <div>
+        <h3 class="font-serif text-lg text-valund-slate">{{ profile.display_name }}</h3>
+        <p class="text-sm text-valund-slate/60">{{ profile.get_region_display }}</p>
+      </div>
+    </div>
+
+    {% if profile.is_identity_verified %}
+      <div class="flex items-center space-x-1 text-valund-moss">
+        <span class="text-xs font-medium uppercase">Verified</span>
+      </div>
+    {% endif %}
+  </div>
+</div>
