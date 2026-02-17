@@ -4,6 +4,8 @@
   "private": true,
   "description": "Frontend tooling for Valund",
   "scripts": {
+    "build:css": "bun build static/css/index.css --outdir static/dist --minify && bun -e \"import {readFileSync, writeFileSync} from 'node:fs'; import {brotliCompressSync} from 'node:zlib'; const inPath='static/dist/index.css'; const outPath='static/dist/index.css.br'; writeFileSync(outPath, brotliCompressSync(readFileSync(inPath)));\"",
+    "watch:css": "bun build static/css/index.css --outdir static/dist --watch --minify"
     "build:css": "bun build static/css/index.css --outdir static/dist",
     "watch:css": "bun build static/css/index.css --outdir static/dist --watch"
     "build:css": "tailwindcss -i ./assets/input.css -o ./assets/output.css --minify",

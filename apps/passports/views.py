@@ -1,6 +1,7 @@
 from django.core.exceptions import ObjectDoesNotExist
 from django.http import HttpRequest, HttpResponse, JsonResponse
 from django.views import View
+from passports.selectors import get_passport_context
 from passports.selectors import get_passport_data
 from django.http import HttpRequest, HttpResponse, HttpResponseNotFound
 from django.views import View
@@ -10,6 +11,7 @@ from passports.selectors import passport_detail
 class PassportDetailView(View):
     def get(self, request: HttpRequest) -> HttpResponse:
         try:
+            payload = get_passport_context(str(request.user.id))
             payload = get_passport_data(str(request.user.id))
         except ObjectDoesNotExist:
             return HttpResponse("passport-not-found", status=404)

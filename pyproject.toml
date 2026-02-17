@@ -11,6 +11,11 @@ dependencies = [
   "django-allauth[socialaccount,openidconnect]>=65.0",
   "uvicorn[standard]>=0.32",
   "django-environ>=0.11",
+  "django-redis>=5.4.0",
+  "msgpack>=1.1.0",
+  "psycopg[binary]>=3.2",
+  "celery[redis]>=5.4",
+  "whitenoise[brotli]>=6.7",
   "psycopg[binary]>=3.2",
   "celery[redis]>=5.4",
   "whitenoise[brotli]>=6.7",
@@ -29,6 +34,13 @@ dev = [
   "pytest-django>=4.9.0",
   "pytest-cov>=6.0.0",
   "pre-commit>=4.0.0",
+  "pytest>=8.0.0",
+  "pytest-django>=4.9.0",
+  "pytest-xdist>=3.6.0",
+  "coverage[toml]>=7.6.0",
+  "pre-commit>=4.0.0",
+
+  "pytest>=8.0.0",
 ]
 
 [tool.ruff]
@@ -54,3 +66,17 @@ ignore_missing_imports = true
 
 [tool.django-stubs]
 django_settings_module = "config.settings.local"
+
+[tool.pytest.ini_options]
+DJANGO_SETTINGS_MODULE = "config.settings.test"
+python_files = ["tests.py", "test_*.py"]
+addopts = "--strict-markers --no-migrations --reuse-db -n auto"
+
+[tool.coverage.run]
+source = ["apps"]
+omit = ["*/migrations/*", "*/tests/*"]
+django_settings_module = "valund.settings"
+
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
