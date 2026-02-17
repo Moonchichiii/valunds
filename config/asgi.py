@@ -1,3 +1,4 @@
+"""ASGI config for Valund, ready for uvicorn high-concurrency execution."""
 """ASGI config for Valund."""
 
 import os

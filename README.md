@@ -2,6 +2,12 @@
 
 High-trust Nordic competence marketplace bootstrap.
 
+## Enterprise foundation
+
+- Atomic domain architecture under `apps/`.
+- Modular orchestration under `config/`.
+- Tailwind CSS v4 zero-config entrypoint at `static/css/index.css`.
+- HTMX + DRF unified selector pattern for reusable data flows.
 ## Atomic repository architecture
 
 - `apps/` contains self-contained domain apps (`accounts`, `core`, `passports`, `bookings`).
@@ -18,6 +24,7 @@ uv sync --all-extras
 
 # Frontend workspace (bun)
 bun install
+bun run watch:css
 
 # Developer guardrails
 uv run pre-commit install

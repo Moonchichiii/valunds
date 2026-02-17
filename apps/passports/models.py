@@ -2,6 +2,8 @@ from __future__ import annotations
 
 from core.models import BaseModel
 from django.conf import settings
+from django.contrib.postgres.indexes import GinIndex
+from django.contrib.postgres.search import SearchVector
 from django.db import models
 
 
@@ -26,6 +28,22 @@ class CompetencePassport(BaseModel):
         choices=VerificationTier.choices,
         default=VerificationTier.BASIC,
     )
+    sector = models.CharField(max_length=64, default="general")
+    headline = models.CharField(max_length=255)
+    summary = models.TextField(blank=True)
+
+    class Meta:
+        indexes = [
+            GinIndex(
+                SearchVector("headline", "summary", "sector"),
+                name="passport_search_gin_idx",
+            )
+        ]
+
+    @property
+    def full_name(self) -> str:
+        return self.user.get_full_name() or self.user.username
+
     headline = models.CharField(max_length=255)
     summary = models.TextField(blank=True)
 
